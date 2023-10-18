@@ -1,0 +1,52 @@
+<!doctype html>
+<html>
+<head>
+    <title>Live Updating Graph</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <canvas id="myChart" width="400" height="200"></canvas>
+
+    <script>
+        var ctx = document.getElementById('myChart').getContext('2d');
+        var chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: Array.from({length: 5}, (_, i) => i + 1),
+                datasets: [{
+                    label: 'Data',
+                    data: [],
+                    borderColor: 'blue',
+                    borderWidth: 1,
+                    fill: false
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: false
+                    }
+                }
+            }
+        });
+
+        function fetchData() {
+            fetch('/data')
+            .then(response => response.json())
+            .then(data => {
+                chart.data.datasets[0].data = data.data;
+                chart.update();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+
+            // Call fetchData() function again after a delay (e.g., 1000 milliseconds or 1 second)
+            setTimeout(fetchData, 1000);
+        }
+
+        // Call fetchData() function initially to start fetching data
+        fetchData();
+    </script>
+</body>
+</html>
